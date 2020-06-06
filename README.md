@@ -8,7 +8,8 @@ A .Net Core Solution that parses an html template and converts to pdf document.
 ## Description
 
 Generate a pdf document from an html page generated with [Materialize Css](https://materializecss.com/). 
-The PDF document is generated using the [wk<html>topdf](https://wkhtmltopdf.org/) library. There are also linux and mac os versions of this library.
+
+The PDF document is generated using the [wkhtmltopdf](https://wkhtmltopdf.org/) library. There are also linux and mac os versions of this library.
 
 ## Features
 
