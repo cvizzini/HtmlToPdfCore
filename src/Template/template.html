@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title>EAS Quote</title>
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection" />
+    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="section">
+            <div class="col s12 center" id="watermark">{{Watermark}}</div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="section">
+            <div class="row">
+                <div class="col s12 center">
+                    <h5><b>{{CompanyName}}</b> <small>{{CompanyNumber}}</small></h5> QUOTATION
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s2"><img class="responsive-img" src="images/logo.png"></div>
+                <div class="col s6 ">
+                    <div class="row"></div>
+                    <div class="row"></div>
+                    <div class="row"></div>
+                    <div class="row">
+                        <div class="col s2">To:</div>
+                        <div class="col s8">{{To}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col s2">Attn:</div>
+                        <div class="col s8">{{Attention}}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col s2">Date:</div>
+                        <div class="col s8">{{Date}}</div>
+                    </div>
+                </div>
+                <div class="col s2">QUOTE {{QuoteNumber}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="section">
+            <table>
+                <colgroup>
+                    <col style="width:70%">
+                    <col style="width:15%">
+                    <col style="width:15%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th cla>Description</th>
+                        <th>Quantity</th>
+                        <th>Cost Each</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{TableBody}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="container">
+        <div class="section">
+            <div class="row">
+                <div class="col s12">
+                   <b>Conditions</b>
+                </div>
+                <div class="col s12">
+                    {{Conditions}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s1">
+                    Name:
+                </div>
+                <div class="col s5">
+                    <input type="text" class="signature" />
+                </div>
+                <div class="col s1">
+                    Signature:
+                </div>
+                <div class="col s5">
+                    <input type="text" class="signature" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    We trust the above is of interest to you and look forward to your further instructions. Please do not
+                    hesitate to contact us should you require any additional information. If acceptable, please authorise
+                    this quotation and fax/email back to us so that we can reserve or order your equipment timeously,
+                    assuring you of our most professional service and attention.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <div class="row">
+                <div class="col s12">
+                    Yours sincerely
+                </div>
+            </div>
+
+            <div class="row">
+                <br />
+                <br />
+                <br />
+                <div class="col s3 signature">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    {{User}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="js/materialize.js"></script>
+    <script src="js/init.js"></script>
+
+</body>
+
+</html>
