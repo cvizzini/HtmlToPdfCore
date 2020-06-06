@@ -30,4 +30,4 @@ The template.html provide is an example of a quote which illustrate the followin
 
 ## License
 
-[GNU GENERAL PUBLIC LICENSE](LICENSE.TXT)
+[GNU GENERAL PUBLIC LICENSE](LICENSE)
