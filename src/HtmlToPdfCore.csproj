@@ -8,6 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Haukcode.DinkToPdf" Version="1.1.2" />
 		<PackageReference Include="Serilog" Version="4.3.1" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
 		<PackageReference Include="Stubble.Core" Version="1.10.8" />
@@ -15,34 +16,58 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.3" />
 	</ItemGroup>
 
+	<!--
+		DinkToPdf requires the native libwkhtmltox library at the process working directory.
+		The package ships platform-specific binaries under runtimes/<rid>/native/.
+		The correct binary is copied next to the output exe at build time.
+	-->
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+		<None Include="$(NuGetPackageRoot)haukcode.dinktopdf\1.1.2\runtimes\win-x64\native\wkhtmltox.dll">
+			<Link>wkhtmltox.dll</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+		<None Include="$(NuGetPackageRoot)haukcode.dinktopdf\1.1.2\runtimes\linux-x64\native\libwkhtmltox.so">
+			<Link>libwkhtmltox.so</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+		<None Include="$(NuGetPackageRoot)haukcode.dinktopdf\1.1.2\runtimes\osx-x64\native\libwkhtmltox.dylib">
+			<Link>libwkhtmltox.dylib</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<!-- Template assets: copied to output so the app can locate them at runtime -->
 	<ItemGroup>
-	  <None Update="Template\css\materialize.css">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Template\css\materialize.min.css">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Template\css\style.css">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Template\images\logo.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Template\js\init.js">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Template\js\materialize.js">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Template\js\materialize.min.js">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Template\template.html">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="wkhtmltopdf\Windows\wkhtmltopdf.exe">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+		<None Update="Templates\quote.html">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Templates\css\materialize.css">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Templates\css\materialize.min.css">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Templates\css\style.css">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Templates\images\logo.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Templates\js\init.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Templates\js\materialize.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Templates\js\materialize.min.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>

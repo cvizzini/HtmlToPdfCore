@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0" />
+    <title>Quotation &ndash; {{QuoteNumber}}</title>
+    <link href="css/style.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+
+    {{#Watermark}}<div id="watermark">{{Watermark}}</div>{{/Watermark}}
+
+    <div class="page">
+
+        <!-- ── Header ── -->
+        <div class="header">
+            <div class="header-left">
+                <div class="company-name">{{CompanyName}}</div>
+                <div class="company-number">Reg. No. {{CompanyNumber}}</div>
+            </div>
+            <div class="header-center">
+                <img src="images/logo.png" alt="Company Logo" />
+            </div>
+            <div class="header-right">
+                <div class="doc-title">Quotation</div>
+                <div class="doc-number">No. {{QuoteNumber}}</div>
+            </div>
+        </div>
+
+        <!-- ── Bill-To / Quote Details ── -->
+        <div class="meta-row">
+            <div class="meta-box">
+                <div class="meta-box-title">Billed To</div>
+                <div class="meta-field">
+                    <span class="meta-label">Company:</span>
+                    <span class="meta-value">{{To}}</span>
+                </div>
+                <div class="meta-field">
+                    <span class="meta-label">Attention:</span>
+                    <span class="meta-value">{{Attention}}</span>
+                </div>
+            </div>
+            <div class="meta-box">
+                <div class="meta-box-title">Quote Details</div>
+                <div class="meta-field">
+                    <span class="meta-label">Quote No:</span>
+                    <span class="meta-value">{{QuoteNumber}}</span>
+                </div>
+                <div class="meta-field">
+                    <span class="meta-label">Date:</span>
+                    <span class="meta-value">{{Date}}</span>
+                </div>
+                <div class="meta-field">
+                    <span class="meta-label">Valid For:</span>
+                    <span class="meta-value">10 days from date above</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Line Items ── -->
+        <div class="table-wrap">
+            <div class="section-title">Line Items</div>
+            <table>
+                <colgroup>
+                    <col class="col-desc" />
+                    <col class="col-qty" />
+                    <col class="col-cost" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="align-right">Quantity</th>
+                        <th class="align-right">Cost Each</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#Items}}
+                    {{#Description}}<tr>{{/Description}}{{^Description}}<tr class="total-row">{{/Description}}
+                        <td>{{Description}}</td>
+                        <td class="align-right">{{Quantity}}</td>
+                        <td class="align-right">{{Cost}}</td>
+                    </tr>
+                    {{/Items}}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ── Terms & Conditions ── -->
+        <div class="conditions-wrap">
+            <div class="section-title">Terms &amp; Conditions</div>
+            <div class="conditions-box">{{{Conditions}}}</div>
+        </div>
+
+        <!-- ── Sign-off ── -->
+        <p class="signoff-text">
+            We trust the above is of interest to you and look forward to your further instructions.
+            Please do not hesitate to contact us should you require any additional information.
+            If acceptable, please authorise this quotation and return it to us so that we can reserve
+            or order your equipment timeously, assuring you of our most professional service and attention.
+        </p>
+
+        <!-- ── Signature block ── -->
+        <div class="sig-block">
+            <div class="sig-cell">
+                <div class="sig-field-label">Authorised Name</div>
+                <div class="sig-line"></div>
+                <div class="sig-hint">Print name clearly</div>
+            </div>
+            <div class="sig-cell">
+                <div class="sig-field-label">Signature &amp; Date</div>
+                <div class="sig-line"></div>
+                <div class="sig-hint">Signature / Date</div>
+            </div>
+        </div>
+
+        <!-- ── Footer ── -->
+        <div class="footer">
+            <div class="footer-left">
+                <div class="footer-name">{{User}}</div>
+                <div class="footer-sincerely">Yours sincerely</div>
+            </div>
+            <div class="footer-right">
+                <div class="footer-eoe">E. &amp; O.E. &ndash; Errors and omissions excepted</div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
