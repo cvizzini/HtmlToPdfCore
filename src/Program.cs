@@ -1,33 +1,30 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Diagnostics;
-using System.Reflection;
-using System.Threading.Tasks;
-using Wkhtmltopdf.NetCore;
+﻿using System.Reflection;
+using HtmlToPdfCore;
+using Serilog;
 
-namespace HtmlToPdfCore
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .CreateLogger();
+
+try
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            var path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+    var path = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
 
-            var htmlParser = new HtmlParser();
-            var htmlTemplate = @$"{path}\Template\template.html";
-            var htmlOutput = @$"{path}\Template\test123.html";
-            var pdfOutput = "TestQuote.pdf";
+    var htmlParser = new HtmlParser();
+    var htmlTemplate = Path.Combine(path, "Template", "template.html");
+    var htmlOutput = Path.Combine(path, "Template", "test123.html");
+    var pdfOutput = "TestQuote.pdf";
 
-            htmlParser.Parse(htmlTemplate, htmlParser.BuildDictionary(), htmlOutput);
+    await htmlParser.ParseAsync(htmlTemplate, htmlParser.BuildTemplateData(), htmlOutput);
 
-            var htmlToPdfService = new HtmlToPdfService();
-            htmlToPdfService.CreatePdf(htmlOutput, pdfOutput);
+    var htmlToPdfService = new HtmlToPdfService(Log.Logger);
+    htmlToPdfService.CreatePdf(htmlOutput, pdfOutput);
 
-            Console.WriteLine("Press enter to quit...");
-            Console.ReadLine();
-        }
-    }
+    Log.Information("Press enter to quit...");
+    Console.ReadLine();
+}
+finally
+{
+    await Log.CloseAndFlushAsync();
 }

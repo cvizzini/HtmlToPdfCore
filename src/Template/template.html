@@ -64,7 +64,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{TableBody}}
+                    {{#Items}}
+                    <tr>
+                        <td>{{Description}}</td>
+                        <td>{{Quantity}}</td>
+                        <td>{{Cost}}</td>
+                    </tr>
+                    {{/Items}}
                 </tbody>
             </table>
         </div>
@@ -76,7 +82,7 @@
                    <b>Conditions</b>
                 </div>
                 <div class="col s12">
-                    {{Conditions}}
+                    {{{Conditions}}}
                 </div>
             </div>
             <div class="row">
