@@ -1,109 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Text;
+using HtmlToPdfCore.Models;
+using Stubble.Core;
+using Stubble.Core.Builders;
 
-namespace HtmlToPdfCore
+namespace HtmlToPdfCore;
+
+/// <summary>
+/// Renders a Mustache HTML template against a strongly-typed view model
+/// and writes the rendered result to disk, ready for PDF conversion.
+/// </summary>
+public class HtmlParser
 {
+    private readonly StubbleVisitorRenderer _renderer = new StubbleBuilder().Build();
+
     /// <summary>
-    /// Replace html place holders with the values provided
+    /// Renders the Mustache template at <paramref name="htmlFilePath"/> with the supplied
+    /// <paramref name="data"/> and writes the output HTML to <paramref name="outputHtmlFilePath"/>.
     /// </summary>
-    public class HtmlParser
+    /// <param name="htmlFilePath">Path to the Mustache HTML template file.</param>
+    /// <param name="data">View model whose properties map to template placeholders.</param>
+    /// <param name="outputHtmlFilePath">Destination path for the rendered HTML output.</param>
+    public async Task ParseAsync(
+        string htmlFilePath,
+        object data,
+        string outputHtmlFilePath)
     {
-        /// <summary>
-        /// Replaces the {{placeholders}} of the html template with the dictionary values
-        /// </summary>
-        /// <param name="htmlFilePath">path to html template file</param>
-        /// <param name="keyValues">Dictionary of values to replace in the template</param>
-        /// <param name="outputHtmlFileName"> output html file name to convert to pdf</param>
-        public void Parse(string htmlFilePath, Dictionary<string, string> keyValues, string outputHtmlFileName)
-        {
-            string htmlFile = File.ReadAllText(htmlFilePath);
-            foreach (var keyValue in keyValues)
-            {
-                htmlFile = htmlFile.Replace("{{" + keyValue.Key + "}}", keyValue.Value);
-            }
-            File.WriteAllText(outputHtmlFileName, htmlFile);
-        }
+        ArgumentException.ThrowIfNullOrEmpty(htmlFilePath);
+        ArgumentException.ThrowIfNullOrEmpty(outputHtmlFilePath);
+        ArgumentNullException.ThrowIfNull(data);
 
-        public Dictionary<string, string> BuildDictionary()
-        {
-            var keyValues = new Dictionary<string, string>();
-            var companyName = "TEST COMPANY (PTY) LTD";
-            var companyNumber = "CC 101";
-            var to = "Test Client";
-            var attention = "John Doe";
-            var date = DateTime.Now.ToShortDateString();
-            var quoteNumber = "12345";
-            var tableBody = BuildQuoteTableBody(BuildFakeTable());
-            var conditions = BuildConditionsOnNewLine(BuildFakeConditions());
-            var user = "Test Person";
-            var watermark = ""; //"Watermark Here";
-
-            keyValues.Add("CompanyName", companyName);
-            keyValues.Add("CompanyNumber", companyNumber);
-            keyValues.Add("To", to);
-            keyValues.Add("Attention", attention);
-            keyValues.Add("Date", date);
-            keyValues.Add("QuoteNumber", quoteNumber);
-            keyValues.Add("TableBody", tableBody);
-            keyValues.Add("Conditions", conditions);
-            keyValues.Add("User", user);
-            keyValues.Add("Watermark", watermark);
-            return keyValues;
-        }
-
-
-        private string BuildQuoteTableBody(List<QuoteTableObject> quoteTable)
-        {
-            var result = "";
-            foreach (var item in quoteTable)
-            {
-                result += "<tr>" +
-                                $"<td>{item.Description}</td>" +
-                                $"<td>{item.Quantity}</td>" +
-                                $"<td>{item.Cost}</td>" +
-                            "</tr>";
-            }
-            return result;
-        }
-
-        private string BuildConditions(string input)
-        {
-            var strlist = input.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            var result = "";
-            foreach (var item in strlist)
-            {
-                result += $@"{item} <br/>";
-            }
-            return result;
-        }
-        private string BuildConditionsOnNewLine(string input)
-        {
-            var result = input.Replace(Environment.NewLine, $@" <br />");
-            return result;
-        }
-
-        private List<QuoteTableObject> BuildFakeTable()
-        {
-            var result = new List<QuoteTableObject>()
-            {
-                {new QuoteTableObject("This is a test description 1", "1", "R200.00") },
-                {new QuoteTableObject("This is a test description 2", "2", "R400.00") },
-                {new QuoteTableObject("This is a test description 3", "3", "R800.00") },
-                {new QuoteTableObject("", "Total Excl. VAT", "R1400.00") },
-            };
-
-            return result;
-        }
-        private string BuildFakeConditions()
-        {
-            var result = new StringBuilder();
-            result.AppendLine("- This quotation is valid for a period of 10 days from the date above");
-            result.AppendLine("- Goods supplied or repaired remain the property until paid for in full");
-            result.AppendLine("-These prices do not include shipping, customs clearance or VAT charges.");
-            result.AppendLine("- E. & O.E. (Errors and omissions excepted).");
-            return result.ToString();
-        }
+        string template = await File.ReadAllTextAsync(htmlFilePath);
+        string rendered = await _renderer.RenderAsync(template, data);
+        await File.WriteAllTextAsync(outputHtmlFilePath, rendered);
     }
+
+    // #7 - Renamed: ConvertNewLinesToHtmlBreaks is clearer about what it actually does
+    // Also extracted as a standalone static helper (extension method candidate)
+    public static string ConvertNewLinesToHtmlBreaks(string input) =>
+        input.Replace(Environment.NewLine, " <br />");
 }
