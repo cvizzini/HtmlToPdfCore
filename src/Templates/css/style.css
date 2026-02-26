@@ -1,0 +1,47 @@
+/* Custom Stylesheet */
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+
+.icon-block {
+  padding: 0 15px;
+}
+
+.icon-block .material-icons {
+	font-size: inherit;
+}
+
+.signature {
+  border: 0;
+  border-bottom: 1px solid #000;
+}
+
+#watermark
+{
+ 
+ transform: rotate(45deg);
+ position:fixed;
+ top: 50%;
+ opacity:0.5;
+ z-index:99;
+ color:red;
+ font-size: 762.5%;
+
+ /* Safari */
+ -webkit-transform: rotate(45deg);
+
+ /* Firefox */
+ -moz-transform: rotate(45deg);
+
+ /* IE */
+ -ms-transform: rotate(45deg);
+
+ /* Opera */
+ -o-transform: rotate(45deg);
+
+ /* Internet Explorer */
+ filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}

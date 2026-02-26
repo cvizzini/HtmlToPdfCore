@@ -1,33 +1,74 @@
 # HtmlToPdfCore
-A .Net Core Solution that parses an html template and converts to pdf document.
 
-## Download the latest .NET Core SDK
+A .NET 10 console application demonstrating how to generate a PDF document from an HTML template in C#.
 
-* [.NET Core 3.1 SDK](release-notes/3.1/README.md)
+## Overview
 
-## Description
+The app renders a [Mustache](https://mustache.github.io/) HTML template against a strongly-typed C# model, then converts the result to a PDF using [DinkToPdf](https://github.com/rdvojmoc/DinkToPdf) — a managed wrapper around the native `libwkhtmltox` library. No external process is spawned; conversion happens entirely in-process.
 
-Generate a pdf document from a html page generated with [Materialize Css](https://materializecss.com/). 
+The included template is a quotation document built with [Materialize CSS](https://materializecss.com/) and demonstrates:
 
-The PDF document is generated using the [wkhtmltopdf](https://wkhtmltopdf.org/) library. There are also linux and mac os versions of this library.
-
-## Features
-
-The template.html provided is an example of a quote which illustrate the following features:
-- Basic Quote Layout
-- Placeholders for actual data
-- Table layout
+- Dynamic data binding via Mustache placeholders
+- Table layout (line items)
+- Conditions / terms section
 - Signature fields
-- Watermark
+- Optional watermark
 
-## Usage
+## Project Structure
 
-1. Edit the template.html as required.
-2. Update the Dictionary as per the placeholder fields within the template.html
-3. Update the logo.png in images.
-4. Run the solution.
-5. View pdf output in the Output Directory in the Bin folder.
+```
+HtmlToPdfCore/
+├── HtmlToPdfCore.sln
+└── src/
+    ├── HtmlToPdfCore.csproj
+    ├── Program.cs                  # Entry point
+    ├── Services/
+    │   ├── HtmlParser.cs           # Mustache template renderer
+    │   └── HtmlToPdfService.cs     # HTML → PDF conversion via DinkToPdf
+    ├── Models/
+    │   ├── QuoteItem.cs            # Single line-item record
+    │   └── QuoteTemplateData.cs    # Full quote view model
+    ├── Data/
+    │   └── SampleDataFactory.cs    # Hardcoded demo data (replace with your source)
+    └── Templates/
+        ├── quote.html              # Mustache HTML template
+        ├── css/
+        ├── images/
+        └── js/
+```
+
+## Getting Started
+
+### Prerequisites
+
+- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+
+### Run
+
+```bash
+cd src
+dotnet run
+```
+
+The generated PDF is written to `bin/Debug/net10.0/Output/`.
+
+## Customisation
+
+1. Edit `Templates/quote.html` — use `{{Placeholder}}` for scalar values and `{{#Items}}...{{/Items}}` for lists.
+2. Update `Models/QuoteTemplateData.cs` and `Models/QuoteItem.cs` to match your data shape.
+3. Replace `Data/SampleDataFactory.cs` with your own data source (database, API, etc.).
+4. Swap `Templates/images/logo.png` with your own logo.
+5. Adjust paper size, margins, and orientation in `Services/HtmlToPdfService.cs` → `BuildPdfDocument()`.
+
+## Dependencies
+
+| Package | Purpose |
+|---|---|
+| `Haukcode.DinkToPdf` | HTML → PDF via native libwkhtmltox |
+| `Stubble.Core` | Mustache template rendering |
+| `Serilog` + `Serilog.Sinks.Console` | Structured logging |
+| `Microsoft.Extensions.Hosting` | DI / hosting abstractions |
 
 ## License
 
-[GNU GENERAL PUBLIC LICENSE](LICENSE)
+[GNU General Public License](LICENSE)
