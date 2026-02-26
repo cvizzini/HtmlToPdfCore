@@ -5,57 +5,73 @@ using Serilog;
 namespace HtmlToPdfCore;
 
 /// <summary>
-/// Convert Html to pdf using https://wkhtmltopdf.org/
+/// Converts an HTML file to PDF using the bundled wkhtmltopdf binary.
+/// See: https://wkhtmltopdf.org/
 /// </summary>
 public class HtmlToPdfService
 {
-    private readonly string _path;
-    private readonly string _outputDirctory;
+    private readonly string _basePath;
+
+    // #3 - Fixed typo: _outputDirctory → _outputDirectory
+    private readonly string _outputDirectory;
     private readonly ILogger _logger;
 
     public HtmlToPdfService(ILogger logger)
     {
         _logger = logger.ForContext<HtmlToPdfService>();
-        _path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-        _outputDirctory = $@"{_path}\Output\";
+
+        // #2 - Added null guard with descriptive error instead of silent null-forgiving
+        _basePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location)
+            ?? throw new InvalidOperationException("Could not resolve the entry assembly location.");
+
+        _outputDirectory = Path.Combine(_basePath, "Output");
         CreateOutputDirectory();
     }
 
-    public void CreatePdf(string htmlFilePath, string fileOutputName)
+    // #4 - Made async; reads stdout/stderr with async methods
+    public async Task CreatePdfAsync(string htmlFilePath, string fileOutputName)
     {
         try
         {
-            // Path to the wkhtmltopdf.exe
-            var pi = new ProcessStartInfo(@$"{_path}\wkhtmltopdf\Windows\wkhtmltopdf.exe");
-            pi.CreateNoWindow = true;
-            pi.UseShellExecute = false;
-            pi.WorkingDirectory = _path;
-            pi.RedirectStandardOutput = true;
-            pi.RedirectStandardError = true;
-
             var htmlFile = new FileInfo(htmlFilePath);
 
-            //Ensure output extension has pdf
-            var pdfFileOutputName = fileOutputName.EndsWith(".pdf", StringComparison.InvariantCultureIgnoreCase) ?
-                fileOutputName : $"{fileOutputName}.pdf";
+            // Ensure output has a .pdf extension
+            var pdfFileName = fileOutputName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)
+                ? fileOutputName
+                : $"{fileOutputName}.pdf";
 
-            var outputPath = (@$"{_outputDirctory}{pdfFileOutputName}");
-            pi.WorkingDirectory = htmlFile.Directory.FullName;
+            var outputPath = Path.Combine(_outputDirectory, pdfFileName);
 
-            pi.Arguments = @$"{htmlFile.Name} {outputPath}";
-            _logger.Information("Wkhtmltopdf Output:");
-            using (var process = Process.Start(pi))
+            // #1 - Object initialiser used consistently; WorkingDirectory set once
+            var startInfo = new ProcessStartInfo(Path.Combine(_basePath, "wkhtmltopdf", "Windows", "wkhtmltopdf.exe"))
             {
-                string output = process.StandardOutput.ReadToEnd();
-                if (!string.IsNullOrWhiteSpace(output))
-                    _logger.Debug("{Output}", output);
-                string err = process.StandardError.ReadToEnd();
-                if (!string.IsNullOrWhiteSpace(err))
-                    _logger.Warning("{StdErr}", err);
-                process.WaitForExit();
-                _logger.Information("wkhtmltopdf exited with code {ExitCode}", process.ExitCode);
-            }
+                CreateNoWindow          = true,
+                UseShellExecute         = false,
+                WorkingDirectory        = htmlFile.Directory!.FullName,
+                RedirectStandardOutput  = true,
+                RedirectStandardError   = true,
+                Arguments               = $"{htmlFile.Name} {outputPath}"
+            };
 
+            _logger.Information("wkhtmltopdf starting...");
+
+            using var process = Process.Start(startInfo)
+                ?? throw new InvalidOperationException("Failed to start wkhtmltopdf process.");
+
+            // #4 - Async reads prevent deadlocks on large output buffers
+            string output = await process.StandardOutput.ReadToEndAsync();
+            string error  = await process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+
+            if (!string.IsNullOrWhiteSpace(output))
+                _logger.Debug("{Output}", output);
+
+            if (!string.IsNullOrWhiteSpace(error))
+                _logger.Warning("{StdErr}", error);
+
+            _logger.Information("wkhtmltopdf exited with code {ExitCode}", process.ExitCode);
+
+            // #8 - Fire-and-forget: open the file without blocking until the viewer is closed
             OpenFileWithDefaultApplication(outputPath);
         }
         catch (Exception ex)
@@ -64,23 +80,18 @@ public class HtmlToPdfService
         }
     }
 
-    private static void OpenFileWithDefaultApplication(string pdfFileOutputName)
+    // #8 - Removed WaitForExit(); we don't want to block until the user closes their PDF viewer
+    private static void OpenFileWithDefaultApplication(string filePath)
     {
-        var p = new Process();
-        p.StartInfo = new ProcessStartInfo(pdfFileOutputName)
+        Process.Start(new ProcessStartInfo(filePath)
         {
             UseShellExecute = true
-        };
-        p.Start();
-        p.WaitForExit();
+        });
     }
 
     private void CreateOutputDirectory()
     {
-        var directory = new DirectoryInfo(_outputDirctory);
-        if (directory.Exists)
-            return;
-
-        directory.Create();
+        if (!Directory.Exists(_outputDirectory))
+            Directory.CreateDirectory(_outputDirectory);
     }
 }
